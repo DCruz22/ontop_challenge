@@ -10,12 +10,10 @@ import coil.compose.AsyncImage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.graphics.painter.ColorPainter
 
 @Composable
-fun PokeImage(
+fun PokemonImage(
     url: String?,
     contentDescription: String?,
     modifier: Modifier = Modifier,
@@ -28,7 +26,7 @@ fun PokeImage(
         AsyncImage(
             model = url,
             contentDescription = contentDescription,
-//            placeholder = painterResource(R.drawable.progress_indeterminate_horizontal),
+            placeholder = ColorPainter(Color.LightGray),
             error = painterResource(id = R.drawable.ic_menu_report_image),
             contentScale = ContentScale.Crop,
             modifier = modifier

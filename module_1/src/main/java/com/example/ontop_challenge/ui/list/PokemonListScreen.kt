@@ -12,70 +12,62 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.ontop_challenge.R
 import com.example.ontop_challenge.domain.model.Pokemon
-import com.example.ontop_challenge.domain.model.UiState
-import com.example.ontop_challenge.ui.utils.PokeImage
+import com.example.ontop_challenge.ui.utils.PokemonImage
 import com.example.ontop_challenge.ui.viewmodel.PokemonListViewModel
+import kotlinx.coroutines.flow.flowOf
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PokemonList(
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PokemonListViewModel = koinViewModel()
+    viewModel: PokemonListViewModel = koinViewModel(),
+    onRefresh: (() -> Unit) -> Unit = {}
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val pagingItems = viewModel.pokemonPagingData.collectAsLazyPagingItems()
+    
+    onRefresh { pagingItems.refresh() }
 
     PokemonListScreen(
-        modifier,
-        state = uiState,
-        onItemClick = onItemClick,
-        onReloadList = { viewModel.getPokemonList() }
+        modifier = modifier,
+        pagingItems = pagingItems,
+        onItemClick = onItemClick
     )
 }
 
 @Composable
 fun PokemonListScreen(
+    pagingItems: LazyPagingItems<Pokemon>,
+    onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    state: UiState<List<Pokemon>>,
-    onItemClick: (String) -> Unit = {},
-    onReloadList: () -> Unit = {},
 ) {
-
-    Box(modifier = modifier) {
-        when (state) {
-            is UiState.Loading -> {
+    Box(modifier = modifier.fillMaxSize()) {
+        when (pagingItems.loadState.refresh) {
+            is LoadState.Loading -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
-
-            is UiState.Empty -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        stringResource(id = R.string.no_pokemons),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-
-            is UiState.Error -> {
+            is LoadState.Error -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -83,19 +75,27 @@ fun PokemonListScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Spacer(Modifier.height(8.dp))
-                        Button(onClick = { onReloadList.invoke() }) {
+                        Button(onClick = { pagingItems.retry() }) {
                             Text(stringResource(id = R.string.retry))
                         }
                     }
                 }
             }
-
-            is UiState.Ready -> {
-                PokemonListContent(
-                    list = state.data,
-                    onItemClick = onItemClick,
-                    modifier = Modifier.fillMaxSize()
-                )
+            is LoadState.NotLoading -> {
+                if (pagingItems.itemCount == 0) {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            stringResource(id = R.string.no_pokemons),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                } else {
+                    PokemonListContent(
+                        pagingItems = pagingItems,
+                        onItemClick = onItemClick,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
@@ -103,17 +103,34 @@ fun PokemonListScreen(
 
 @Composable
 fun PokemonListContent(
-    list: List<Pokemon>,
+    pagingItems: LazyPagingItems<Pokemon>,
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(list) { item ->
-            PokemonListItem(
-                pokemon = item,
-                onClick = { onItemClick(item.name) }
-            )
-            HorizontalDivider()
+    LazyColumn(modifier = modifier) {
+        items(
+            count = pagingItems.itemCount,
+            key = pagingItems.itemKey { it.id }
+        ) { index ->
+            val pokemon = pagingItems[index]
+            if (pokemon != null) {
+                PokemonListItem(
+                    pokemon = pokemon,
+                    onClick = { onItemClick(pokemon.name) }
+                )
+                HorizontalDivider()
+            }
+        }
+        
+        if (pagingItems.loadState.append is LoadState.Loading) {
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }
@@ -127,44 +144,33 @@ fun PokemonListItem(pokemon: Pokemon, onClick: () -> Unit) {
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val imageUrl = pokemon.imageUrl
         Box(Modifier.size(64.dp)) {
-            PokeImage(url = imageUrl, contentDescription = pokemon.name, modifier = Modifier.fillMaxSize())
+            PokemonImage(url = pokemon.imageUrl, contentDescription = pokemon.name, modifier = Modifier.fillMaxSize())
         }
 
         Spacer(Modifier.width(12.dp))
 
         Column {
-            Text(text = pokemon.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(text = pokemon.name.replaceFirstChar { it.uppercaseChar() }, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(text = stringResource(id = R.string.id_format, pokemon.id), style = MaterialTheme.typography.bodySmall)
         }
     }
 }
 
-/* Previews */
 @Preview(showBackground = true)
 @Composable
-fun PokemonListItemPreview() {
-    val items: List<Pokemon> = listOf(
-        Pokemon(
-            name = "bulbasaur",
-            id = "1",
-            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"
-        ),
-        Pokemon(
-            name = "ivysaur",
-            id = "2",
-            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png"
-        ),
-        Pokemon(
-            name = "venusaur",
-            id = "3",
-            imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png"
-        ),
+fun PokemonListContentPreview() {
+    val pokemonList = listOf(
+        Pokemon("Bulbasaur", "1", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png"),
+        Pokemon("Ivysaur", "2", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png"),
+        Pokemon("Venusaur", "3", "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png")
     )
+    val pagingData = PagingData.from(pokemonList)
+    val pagingItems = flowOf(pagingData).collectAsLazyPagingItems()
+
     MaterialTheme {
         PokemonListContent(
-            list = items,
+            pagingItems = pagingItems,
             onItemClick = {}
         )
     }
