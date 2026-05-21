@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">ontop_</string>
+    <string name="app_name">ontop_challenge</string>
+    <string name="pokemon_title">Pokémon</string>
+    <string name="refresh">Refresh</string>
+    <string name="no_pokemons">No pokemons available</string>
+    <string name="failed_load_pokemons">Failed to load pokemons</string>
+    <string name="retry">Retry</string>
+    <string name="details_title">Details</string>
+    <string name="back">Back</string>
+    <string name="no_details">No details available</string>
+    <string name="failed_load_details">Failed to load details</string>
+    <string name="height_format">Height: %1$d</string>
+    <string name="weight_format">Weight: %1$d</string>
+    <string name="id_format">ID: %1$s</string>
 </resources>

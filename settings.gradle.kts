@@ -22,7 +22,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ontop_"
+rootProject.name = "ontop_challenge"
 include(":module_1")
 include(":module_2")
 include(":module_3")
