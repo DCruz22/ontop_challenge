@@ -26,8 +26,8 @@ class PasswordGeneratorTest {
         )
 
         assertTrue(password.any { it.isUpperCase() })
+        assertTrue(password.all { it.isLetterOrDigit() })
         assertFalse(password.any { it.isDigit() })
-        assertFalse(password.any { symbols.contains(it) })
     }
 
     @Test
@@ -40,8 +40,8 @@ class PasswordGeneratorTest {
         )
 
         assertTrue(password.any { it.isDigit() })
+        assertTrue(password.all { it.isLetterOrDigit() })
         assertFalse(password.any { it.isUpperCase() })
-        assertFalse(password.any { symbols.contains(it) })
     }
 
     @Test
@@ -53,7 +53,7 @@ class PasswordGeneratorTest {
             useSymbols = true
         )
 
-        assertTrue(password.any { symbols.contains(it) })
+        assertTrue(password.any { !it.isLetterOrDigit() })
         assertFalse(password.any { it.isUpperCase() })
         assertFalse(password.any { it.isDigit() })
     }
@@ -105,6 +105,7 @@ class PasswordGeneratorTest {
         assertEquals(15, password.length)
         assertTrue(password.any { it.isUpperCase() })
         assertTrue(password.any { it.isDigit() })
+        assertTrue(password.all { it.isLetterOrDigit() })
     }
 
     @Test
@@ -118,9 +119,5 @@ class PasswordGeneratorTest {
         }
 
         assertEquals(1000, generated.size)
-    }
-
-    companion object{
-        private const val symbols = "!@#$%^&*()-_=+[]{}<>?/"
     }
 }
