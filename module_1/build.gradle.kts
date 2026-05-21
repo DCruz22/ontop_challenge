@@ -55,7 +55,12 @@ dependencies {
     implementation(libs.gson.converter)
 
     implementation(libs.koin.android)
+    implementation(libs.koin.compose)
     implementation(libs.koin.core)
+
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
