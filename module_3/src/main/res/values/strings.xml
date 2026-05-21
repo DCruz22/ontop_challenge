@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">module_3</string>
+    <string name="password_generator_title">Password Generator</string>
+    <string name="password_length">Password Length: %1$d</string>
+    <string name="use_uppercase">Use Uppercase</string>
+    <string name="use_numbers">Use Numbers</string>
+    <string name="use_symbols">Use Symbols</string>
+    <string name="generate_password">Generate Password</string>
+    <string name="invalid_input">Invalid input</string>
+    <string name="generated_password">Generated Password</string>
+    <string name="copy">Copy</string>
+    <string name="copy_password">Copy Password</string>
+    <string name="strength_label">Strength: %1$s</string>
+    <string name="strength_weak">Weak</string>
+    <string name="strength_medium">Medium</string>
+    <string name="strength_strong">Strong</string>
 </resources>
