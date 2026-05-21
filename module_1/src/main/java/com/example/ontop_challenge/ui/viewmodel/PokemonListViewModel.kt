@@ -2,7 +2,7 @@ package com.example.ontop_challenge.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ontop_challenge.data.datasource.PokemonResult
+import com.example.ontop_challenge.domain.model.Pokemon
 import com.example.ontop_challenge.domain.model.UiState
 import com.example.ontop_challenge.domain.usecase.GetPokemonListUseCase
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +22,7 @@ class PokemonListViewModel(
     private val refreshSignal = MutableSharedFlow<Unit>(replay = 1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val uiState: StateFlow<UiState<List<PokemonResult>>> = refreshSignal
+    val uiState: StateFlow<UiState<List<Pokemon>>> = refreshSignal
         .flatMapLatest {
             getPokemonListUseCase()
         }
