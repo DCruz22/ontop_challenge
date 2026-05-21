@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.module_3.ui.PasswordGeneratorScreen
 import com.example.module_3.ui.theme.Ontop_Theme
 
 class PasswordGeneratorActivity : ComponentActivity() {
@@ -19,29 +20,8 @@ class PasswordGeneratorActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Ontop_Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                PasswordGeneratorScreen()
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Ontop_Theme {
-        Greeting("Android")
     }
 }
