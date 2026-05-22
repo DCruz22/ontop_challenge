@@ -4,7 +4,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface PokeApiService {
+interface PokemonApiService {
     @GET("pokemon")
     suspend fun getPokemonList(
         @Query("offset") offset: Int,

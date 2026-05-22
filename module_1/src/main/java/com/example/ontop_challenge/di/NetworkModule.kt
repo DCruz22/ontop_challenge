@@ -1,6 +1,6 @@
 package com.example.ontop_challenge.di
 
-import com.example.ontop_challenge.data.datasource.PokeApiService
+import com.example.ontop_challenge.data.datasource.PokemonApiService
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -17,7 +17,7 @@ val networkModule = module {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
-    single<PokeApiService> {
-        get<Retrofit>().create(PokeApiService::class.java)
+    single<PokemonApiService> {
+        get<Retrofit>().create(PokemonApiService::class.java)
     }
 }

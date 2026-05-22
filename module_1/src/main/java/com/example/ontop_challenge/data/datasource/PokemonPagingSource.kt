@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 
 class PokemonPagingSource(
-    private val pokeApiService: PokeApiService
+    private val pokemonApiService: PokemonApiService
 ) : PagingSource<Int, PokemonResult>() {
 
     override fun getRefreshKey(state: PagingState<Int, PokemonResult>): Int? {
@@ -15,7 +15,7 @@ class PokemonPagingSource(
         return try {
             val offset = params.key ?: 0
             val limit = params.loadSize
-            val response = pokeApiService.getPokemonList(offset = offset, limit = limit)
+            val response = pokemonApiService.getPokemonList(offset = offset, limit = limit)
             val results = response.results
 
             LoadResult.Page(
