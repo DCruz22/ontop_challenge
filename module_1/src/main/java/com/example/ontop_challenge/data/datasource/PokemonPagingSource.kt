@@ -8,7 +8,7 @@ class PokemonPagingSource(
 ) : PagingSource<Int, PokemonResult>() {
 
     override fun getRefreshKey(state: PagingState<Int, PokemonResult>): Int? {
-        return state.anchorPosition
+        return null
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PokemonResult> {
