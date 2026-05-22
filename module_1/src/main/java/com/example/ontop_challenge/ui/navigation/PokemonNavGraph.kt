@@ -1,5 +1,9 @@
 package com.example.ontop_challenge.ui.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -9,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -17,11 +23,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.example.ontop_challenge.R
 import com.example.ontop_challenge.ui.details.PokemonDetails
-import com.example.ontop_challenge.ui.details.PokemonDetailsScreen
 import com.example.ontop_challenge.ui.list.PokemonList
-import com.example.ontop_challenge.ui.list.PokemonListScreen
-import com.example.ontop_challenge.ui.viewmodel.PokemonListViewModel
-import org.koin.androidx.compose.koinViewModel
 
 private const val ROUTE_LIST = "list"
 private const val ROUTE_DETAILS = "details/{name}"
@@ -37,7 +39,7 @@ fun PokemonNavGraph(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     
-    val listViewModel: PokemonListViewModel = koinViewModel()
+    val refreshAction = remember { mutableStateOf<(() -> Unit)?>(null) }
 
     Scaffold(
         topBar = {
@@ -64,7 +66,7 @@ fun PokemonNavGraph(
                 },
                 actions = {
                     if (currentRoute == ROUTE_LIST) {
-                        IconButton(onClick = { listViewModel.getPokemonList() }) {
+                        IconButton(onClick = { refreshAction.value?.invoke() }) {
                             Icon(
                                 painter = painterResource(android.R.drawable.ic_menu_rotate),
                                 contentDescription = stringResource(id = R.string.refresh)
@@ -81,18 +83,22 @@ fun PokemonNavGraph(
             startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(ROUTE_LIST) {
+            composable(ROUTE_LIST,
+                exitTransition = { fadeOut() + slideOutHorizontally(targetOffsetX = { -300 }) },
+            ) {
                 PokemonList(
                     onItemClick = { name ->
                         navController.navigate("details/$name")
                     },
-                    viewModel = listViewModel
+                    onRefresh = { action -> refreshAction.value = action }
                 )
             }
 
             composable(
                 route = ROUTE_DETAILS,
-                arguments = listOf(navArgument(ARG_NAME) { type = NavType.StringType })
+                arguments = listOf(navArgument(ARG_NAME) { type = NavType.StringType }),
+                enterTransition = { fadeIn() + slideInHorizontally(initialOffsetX = { 300 }) },
+                exitTransition = { fadeOut() + slideOutHorizontally(targetOffsetX = { -300 }) },
             ) { backStackEntry ->
                 val name = backStackEntry.arguments?.getString(ARG_NAME) ?: ""
                 PokemonDetails(

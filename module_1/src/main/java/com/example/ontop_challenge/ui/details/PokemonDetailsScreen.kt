@@ -24,7 +24,7 @@ import com.example.ontop_challenge.R
 import com.example.ontop_challenge.domain.model.PokemonDetail
 import com.example.ontop_challenge.domain.model.UiState
 import com.example.ontop_challenge.ui.theme.Ontop_Theme
-import com.example.ontop_challenge.ui.utils.PokeImage
+import com.example.ontop_challenge.ui.utils.PokemonImage
 import com.example.ontop_challenge.ui.viewmodel.PokemonDetailsViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -94,7 +94,7 @@ fun PokemonItemDetailScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        PokeImage(
+        PokemonImage(
             url = pokemon.imageUrl,
             contentDescription = pokemon.name,
             modifier = Modifier.size(200.dp)
