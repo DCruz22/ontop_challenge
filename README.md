@@ -12,7 +12,7 @@ Libraries used: OkHttp, Retrofit, Coroutines, Hilt, Jetpack Compose, Coil, Navig
 - domain: The core layer containing pure business logic. It defines domain models, mappers, and use cases (interactors) that are independent of the UI and data frameworks.
 - ui: The presentation layer built with Jetpack Compose. It follows the MVVM pattern with ViewModels managing UI state through Flows. It also includes navigation logic and reusable UI components.
 
-[Pokemon App Recording](Screen%20Recording%202026-05-22%20at%201.15.53%E2%80%AFAM.mov)
+[Pokemon App Recording](Screen%20Recording%202026-05-22%20at%201.15.53%E2%80%AFAM.mp4)
 
 To run the app, simply open the project in Android Studio and run the `module_1` module.
 
@@ -28,7 +28,7 @@ This challenge consists in creating a method that generates a random password ba
 provided, I chose to implement the `SecureRandom` cause, of the options, it is the most cryptographically secure for authentication credentials (even the
 requirements admitted it was the better option for production).  
 
-[Password Generator Recording](Screen%20Recording%202026-05-22%20at%2012.27.37%E2%80%AFAM.mov)
+[Password Generator Recording](Screen%20Recording%202026-05-22%20at%2012.27.37%E2%80%AFAM.mp4)
 
 To run the app, simply open the project in Android Studio and run the `module_3` module.
 
