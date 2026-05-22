@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ontop_challenge</string>
+    <string name="app_name">PokeApp</string>
     <string name="pokemon_title">Pokémon</string>
     <string name="refresh">Refresh</string>
     <string name="no_pokemons">No pokemons available</string>

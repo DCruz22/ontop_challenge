@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">module_3</string>
+    <string name="app_name">Password Generator</string>
     <string name="password_generator_title">Password Generator</string>
     <string name="password_length">Password Length: %1$d</string>
     <string name="use_uppercase">Use Uppercase</string>

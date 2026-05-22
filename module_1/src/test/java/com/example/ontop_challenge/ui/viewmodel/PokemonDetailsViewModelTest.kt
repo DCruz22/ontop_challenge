@@ -9,7 +9,6 @@ import com.example.ontop_challenge.domain.model.toPokemonDetail
 import com.example.ontop_challenge.domain.usecase.GetPokemonDetailsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -48,7 +47,7 @@ class PokemonDetailsViewModelTest {
     }
 
     @Test
-    fun `loadPokemon updates uiState to Ready`() = runTest(testDispatcher) {
+    fun `loadPokemon updates uiState to Ready`() = runTest {
         val detailResponse = PokemonDetailResponse(
             id = 1,
             name = "bulbasaur",
@@ -63,14 +62,35 @@ class PokemonDetailsViewModelTest {
         
         viewModel.uiState.test {
             assertEquals(UiState.Loading, awaitItem())
+            val ready = awaitItem() as UiState.Ready
+            assertEquals(expectedDetail, ready.data)
+        }
+    }
+
+    @Test
+    fun `reloadPokemonDetails restarts the flow`() = runTest {
+        val detailResponse = PokemonDetailResponse(
+            id = 1,
+            name = "bulbasaur",
+            sprites = Sprites("url"),
+            height = 7,
+            weight = 69
+        )
+        fakeRepository.pokemonDetailsResponse = detailResponse
+        val expectedDetail = detailResponse.toPokemonDetail()
+
+        viewModel.loadPokemon("bulbasaur")
+        
+        viewModel.uiState.test {
+            assertEquals(UiState.Loading, awaitItem())
+            val firstReady = awaitItem() as UiState.Ready
+            assertEquals(expectedDetail, firstReady.data)
             
-            val next = awaitItem()
-            if (next is UiState.Loading) {
-                val ready = awaitItem() as UiState.Ready
-                assertEquals(expectedDetail, ready.data)
-            } else if (next is UiState.Ready) {
-                assertEquals(expectedDetail, next.data)
-            }
+            viewModel.reloadPokemonDetails()
+            
+            assertEquals(UiState.Loading, awaitItem())
+            val secondReady = awaitItem() as UiState.Ready
+            assertEquals(expectedDetail, secondReady.data)
         }
     }
 }
