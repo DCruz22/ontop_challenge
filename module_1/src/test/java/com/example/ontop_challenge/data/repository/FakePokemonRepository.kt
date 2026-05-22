@@ -14,7 +14,10 @@ class FakePokemonRepository : PokemonRepository {
     var pokemonDetailsResponse: PokemonDetailResponse? = null
     var shouldThrowException = false
 
-    override fun getPokemonList(): Flow<PagingData<PokemonResult>> = pokemonListFlow
+    override fun getPokemonList(): Flow<PagingData<PokemonResult>> {
+        if (shouldThrowException) return flow { throw Exception("Error") }
+        return pokemonListFlow
+    }
 
     override fun getPokemonDetails(name: String): Flow<PokemonDetailResponse> = flow {
         if (shouldThrowException) throw Exception("Error")
